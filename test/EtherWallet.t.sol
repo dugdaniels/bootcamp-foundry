@@ -26,7 +26,7 @@ contract EtherWalletTest is Test {
     }
 
     function testUserCanDeposit(uint256 amount) public {
-        vm.assume(amount > 0 && amount <= 100 ether);
+        vm.assume(amount > 0 && amount <= alice.balance);
         vm.prank(alice);
         vm.expectEmit(true, false, false, true, address(wallet));
         emit Deposit(alice, amount);
@@ -38,7 +38,7 @@ contract EtherWalletTest is Test {
     }
 
     function testUserCanDepositViaTransfer(uint256 amount) public {
-        vm.assume(amount > 0 && amount <= 100 ether);
+        vm.assume(amount > 0 && amount <= alice.balance);
         vm.prank(alice);
         vm.expectEmit(true, false, false, true, address(wallet));
         emit Deposit(alice, amount);
@@ -51,7 +51,7 @@ contract EtherWalletTest is Test {
     }
 
     function testUserCanWithdraw(uint256 amount) public {
-        vm.assume(amount > 0 && amount <= 100 ether);
+        vm.assume(amount > 0 && amount <= type(uint256).max - alice.balance);
         vm.deal(address(wallet), amount);
         uint256 startingBalance = alice.balance;
 

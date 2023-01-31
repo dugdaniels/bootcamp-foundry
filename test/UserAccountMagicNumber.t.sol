@@ -7,7 +7,7 @@ import "forge-std/Test.sol";
 import {UserAccountMagicNumber} from "../src/UserAccountMagicNumber.sol";
 
 error InvalidMagicNumber(uint256 sent);
-error MagicNumberAlreadySetForAddress(uint256 number, address setter);
+error MagicNumberAlreadySet(uint256 number, address setter);
 
 contract UserAccountMagicNumberTest is Test {
     event MagicNumberSet(address indexed setter, uint256 number);
@@ -48,7 +48,7 @@ contract UserAccountMagicNumberTest is Test {
         vm.startPrank(alice);
 
         magicNumber.setMagicNumber(1);
-        vm.expectRevert(abi.encodeWithSelector(MagicNumberAlreadySetForAddress.selector, 1, alice));
+        vm.expectRevert(abi.encodeWithSelector(MagicNumberAlreadySet.selector, 1, alice));
         magicNumber.setMagicNumber(2);
 
         vm.stopPrank();

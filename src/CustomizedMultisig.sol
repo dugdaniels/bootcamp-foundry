@@ -8,6 +8,15 @@ error InvalidAddress();
 error NotAuthorized();
 error TransferFailed();
 
+struct Transfer {
+    address recipient;
+    uint256 value;
+    uint128 approvalsRequired;
+    uint128 approvalsReceived;
+    mapping(address => bool) hasApproved;
+    bool executed;
+}
+
 contract Multisig is Ownable {
     event SignerAdded(address indexed addr);
     event SignerRemoved(address indexed addr);
@@ -15,25 +24,12 @@ contract Multisig is Ownable {
     event ApprovalReceived(uint256 indexed transferId, address indexed approver);
     event TransferExecuted(address indexed to, uint256 value);
 
-    struct Transfer {
-        address recipient;
-        uint256 value;
-        uint128 approvalsRequired;
-        uint128 approvalsReceived;
-        mapping(address => bool) hasApproved;
-        bool executed;
-    }
-
-    address[] signers;
-    mapping(address => uint256) signerIndex;
+    mapping(address => bool) public isSigner;
     mapping(uint256 => Transfer) public transfers;
     uint256 transferCount;
     uint256 queuedBalance;
 
     constructor(address[] memory signers_) payable Ownable() {
-        // Signer index starts at 1, so that we can use 0 to indicate non-signers
-        signers = new address[](1);
-
         for (uint256 i; i < signers_.length;) {
             addSigner(signers_[i]);
             unchecked {
@@ -78,31 +74,18 @@ contract Multisig is Ownable {
         if (t.approvalsReceived == t.approvalsRequired) _execute(transferId);
     }
 
-    function isSigner(address addr) public view returns (bool) {
-        return signerIndex[addr] != 0;
-    }
-
     function addSigner(address addr) public onlyOwner {
         if (addr == address(0)) revert InvalidAddress();
-        if (isSigner(addr)) revert InvalidAddress();
+        if (isSigner[addr]) revert InvalidAddress();
 
-        signerIndex[addr] = signers.length;
-        signers.push(addr);
+        isSigner[addr] = true;
         emit SignerAdded(addr);
     }
 
     function removeSigner(address addr) public onlyOwner {
-        if (!isSigner(addr)) revert InvalidAddress();
+        if (!isSigner[addr]) revert InvalidAddress();
 
-        uint256 index = signerIndex[addr];
-        uint256 lastIndex = signers.length - 1;
-        address lastAddr = signers[lastIndex];
-
-        signers[index] = lastAddr;
-        signerIndex[lastAddr] = index;
-        signers.pop();
-
-        delete signerIndex[addr];
+        isSigner[addr] = false;
         emit SignerRemoved(addr);
     }
 
@@ -117,7 +100,7 @@ contract Multisig is Ownable {
     }
 
     modifier onlySigner() {
-        if (!isSigner(msg.sender)) revert NotAuthorized();
+        if (!isSigner[msg.sender]) revert NotAuthorized();
         _;
     }
 

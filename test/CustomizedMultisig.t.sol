@@ -4,11 +4,7 @@ pragma solidity ^0.8.13;
 import {Utilities} from "./utils/Utilities.sol";
 import "forge-std/Test.sol";
 
-import {Multisig} from "../src/CustomizedMultisig.sol";
-
-error InsufficientFunds();
-error InvalidAddress();
-error NotAuthorized();
+import {Multisig, Transfer, InsufficientFunds, InvalidAddress, NotAuthorized} from "../src/CustomizedMultisig.sol";
 
 contract CustomizedMultisigTest is Test {
     event SignerAdded(address indexed addr);
@@ -18,15 +14,6 @@ contract CustomizedMultisigTest is Test {
     event TransferExecuted(address indexed to, uint256 value);
 
     uint256 internal constant BALANCE = 10 ether;
-
-    struct Transfer {
-        address recipient;
-        uint256 value;
-        uint128 approvalsRequired;
-        uint128 approvalsReceived;
-        mapping(address => bool) hasApproved;
-        bool executed;
-    }
 
     Utilities internal utils;
     Multisig public multisig;
@@ -115,7 +102,7 @@ contract CustomizedMultisigTest is Test {
         vm.prank(alice);
         uint256 id = multisig.queueTransfer(bob, BALANCE, 2);
 
-        bytes32 approvalsSlot = bytes32(uint256(keccak256(abi.encodePacked(id, uint256(3)))) + 3);
+        bytes32 approvalsSlot = bytes32(uint256(keccak256(abi.encodePacked(id, uint256(2)))) + 3);
         bytes32 slot = keccak256(abi.encodePacked(abi.encode(bob), approvalsSlot));
         assertEq(vm.load(address(multisig), slot), bytes32(uint256(0)));
 

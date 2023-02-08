@@ -67,11 +67,11 @@ contract Multisig is Ownable {
         if (t.executed) revert NotAuthorized();
         if (t.hasApproved[msg.sender]) revert NotAuthorized();
 
-        ++t.approvalsReceived;
+        uint128 approvals = ++t.approvalsReceived;
         t.hasApproved[msg.sender] = true;
         emit ApprovalReceived(transferId, msg.sender);
 
-        if (t.approvalsReceived == t.approvalsRequired) _execute(transferId);
+        if (approvals == t.approvalsRequired) _execute(transferId);
     }
 
     function addSigner(address addr) public onlyOwner {
@@ -91,12 +91,13 @@ contract Multisig is Ownable {
 
     function _execute(uint256 transferId) internal {
         Transfer storage t = transfers[transferId];
+        address recipient = t.recipient;
 
         t.executed = true;
-        (bool success,) = t.recipient.call{value: t.value}("");
+        (bool success,) = recipient.call{value: t.value}("");
         if (!success) revert TransferFailed();
 
-        emit TransferExecuted(t.recipient, t.value);
+        emit TransferExecuted(recipient, t.value);
     }
 
     modifier onlySigner() {

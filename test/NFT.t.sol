@@ -28,7 +28,7 @@ contract NFTTest is Test {
 
     function testSupportsInterface() public {
         assertTrue(token.supportsInterface(0x01ffc9a7)); // ERC165
-            // assertTrue(token.supportsInterface(0x80ac58cd)); // ERC721
+        assertTrue(token.supportsInterface(0x80ac58cd)); // ERC721
     }
 
     function testBalanceOf(address _address, uint256 balance) public {

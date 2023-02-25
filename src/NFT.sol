@@ -13,10 +13,10 @@ interface IERC721 {
 
     function balanceOf(address _owner) external view returns (uint256);
     function ownerOf(uint256 _tokenId) external view returns (address);
-    // function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes calldata data) external payable;
-    // function safeTransferFrom(address _from, address _to, uint256 _tokenId) external payable;
-    function transferFrom(address _from, address _to, uint256 _tokenId) external payable;
-    function approve(address _approved, uint256 _tokenId) external payable;
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes calldata data) external;
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId) external;
+    function transferFrom(address _from, address _to, uint256 _tokenId) external;
+    function approve(address _approved, uint256 _tokenId) external;
     function setApprovalForAll(address _operator, bool _approved) external;
     function getApproved(uint256 _tokenId) external view returns (address);
     function isApprovedForAll(address _owner, address _operator) external view returns (bool);
@@ -27,7 +27,7 @@ interface IERC165 {
 }
 
 interface ERC721TokenReceiver {
-    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes _data)
+    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data)
         external
         returns (bytes4);
 }
@@ -50,7 +50,7 @@ contract NFT is IERC721, IERC165 {
         return interfaceID_ == type(IERC165).interfaceId || interfaceID_ == type(IERC721).interfaceId;
     }
 
-    function approve(address addr_, uint256 tokenId_) external payable {
+    function approve(address addr_, uint256 tokenId_) external {
         address owner = ownerOf(tokenId_);
         if (msg.sender != owner && !isApprovedForAll(owner, msg.sender)) {
             revert NotApproved();
@@ -79,10 +79,14 @@ contract NFT is IERC721, IERC165 {
     }
 
     function safeTransferFrom(address from_, address to_, uint256 tokenId_) external {
-        safeTransferFrom(from_, to_, tokenId_, "");
+        _safeTransfer(from_, to_, tokenId_, "");
     }
 
-    function safeTransferFrom(address from_, address to_, uint256 tokenId_, bytes calldata _data) public {
+    function safeTransferFrom(address from_, address to_, uint256 tokenId_, bytes calldata data_) public {
+        _safeTransfer(from_, to_, tokenId_, data_);
+    }
+
+    function _safeTransfer(address from_, address to_, uint256 tokenId_, bytes memory _data) internal {
         _transfer(from_, to_, tokenId_);
 
         if (to_.code.length > 0) {

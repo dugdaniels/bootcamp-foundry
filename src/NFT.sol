@@ -25,15 +25,15 @@ contract NFT is IERC165 {
     mapping(address => uint256) private _balances;
     mapping(uint256 => address) private _owners;
 
-    function balanceOf(address _owner) external view returns (uint256) {
-        return _balances[_owner];
+    function balanceOf(address owner_) external view returns (uint256) {
+        return _balances[owner_];
     }
 
-    function ownerOf(uint256 _tokenId) external view returns (address) {
-        return _owners[_tokenId];
+    function ownerOf(uint256 tokenId_) external view returns (address) {
+        return _owners[tokenId_];
     }
 
-    function supportsInterface(bytes4 interfaceID) external pure returns (bool) {
-        return interfaceID == type(IERC165).interfaceId || interfaceID == type(IERC721).interfaceId;
+    function supportsInterface(bytes4 interfaceID_) external pure returns (bool) {
+        return interfaceID_ == type(IERC165).interfaceId || interfaceID_ == type(IERC721).interfaceId;
     }
 }

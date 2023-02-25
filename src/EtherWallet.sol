@@ -15,16 +15,16 @@ contract EtherWallet {
         emit Deposit(msg.sender, msg.value);
     }
 
-    function withdraw(uint256 amount) external {
-        if (balances[msg.sender] < amount) {
+    function withdraw(uint256 amount_) external {
+        if (balances[msg.sender] < amount_) {
             revert InsufficientFunds();
         }
-        balances[msg.sender] -= amount;
-        (bool success,) = msg.sender.call{value: amount}("");
+        balances[msg.sender] -= amount_;
+        (bool success,) = msg.sender.call{value: amount_}("");
         if (!success) {
             revert TransferFailed();
         }
-        emit Withdrawal(msg.sender, amount);
+        emit Withdrawal(msg.sender, amount_);
     }
 
     receive() external payable {

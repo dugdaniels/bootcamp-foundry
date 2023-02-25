@@ -12,11 +12,11 @@ contract Escrow {
     address public immutable recipient;
     uint256 public releaseTimestamp;
 
-    constructor(address recipient_, uint256 timelock) payable {
+    constructor(address recipient_, uint256 timelock_) payable {
         if (msg.value == 0) revert FundsRequired();
 
         recipient = payable(recipient_);
-        releaseTimestamp = block.timestamp + timelock;
+        releaseTimestamp = block.timestamp + timelock_;
     }
 
     function fundsReleased() public view returns (bool) {

@@ -14,61 +14,61 @@ contract EtherWalletWithApprovals {
     mapping(address => uint256) public balances;
     mapping(address => mapping(address => uint256)) public allowances;
 
-    function deposit(address recipient) external payable {
-        balances[recipient] += msg.value;
-        emit Deposit(msg.sender, recipient, msg.value);
+    function deposit(address recipient_) external payable {
+        balances[recipient_] += msg.value;
+        emit Deposit(msg.sender, recipient_, msg.value);
     }
 
-    function increaseAllowance(address spender, uint256 amount) external {
-        if (spender == address(0)) {
+    function increaseAllowance(address spender_, uint256 amount_) external {
+        if (spender_ == address(0)) {
             revert InvalidAddress();
         }
-        allowances[msg.sender][spender] += amount;
-        emit Allowance(msg.sender, spender, allowances[msg.sender][spender]);
+        allowances[msg.sender][spender_] += amount_;
+        emit Allowance(msg.sender, spender_, allowances[msg.sender][spender_]);
     }
 
-    function decreaseAllowance(address spender, uint256 amount) external {
-        if (allowances[msg.sender][spender] < amount) {
-            revokeAllowance(spender);
+    function decreaseAllowance(address spender_, uint256 amount_) external {
+        if (allowances[msg.sender][spender_] < amount_) {
+            revokeAllowance(spender_);
         } else {
-            allowances[msg.sender][spender] -= amount;
-            emit Allowance(msg.sender, spender, allowances[msg.sender][spender]);
+            allowances[msg.sender][spender_] -= amount_;
+            emit Allowance(msg.sender, spender_, allowances[msg.sender][spender_]);
         }
     }
 
-    function revokeAllowance(address spender) public {
-        allowances[msg.sender][spender] = 0;
-        emit Allowance(msg.sender, spender, 0);
+    function revokeAllowance(address spender_) public {
+        allowances[msg.sender][spender_] = 0;
+        emit Allowance(msg.sender, spender_, 0);
     }
 
-    function allowance(address owner, address spender) external view returns (uint256) {
-        return allowances[owner][spender];
+    function allowance(address owner_, address spender_) external view returns (uint256) {
+        return allowances[owner_][spender_];
     }
 
-    function withdraw(uint256 amount) external {
-        _transfer(msg.sender, msg.sender, amount);
+    function withdraw(uint256 amount_) external {
+        _transfer(msg.sender, msg.sender, amount_);
     }
 
-    function transferFrom(address from, address to, uint256 amount) external {
-        if (allowances[from][msg.sender] < amount) {
+    function transferFrom(address from_, address to_, uint256 amount_) external {
+        if (allowances[from_][msg.sender] < amount_) {
             revert InsufficientAllowance();
         }
-        allowances[from][msg.sender] -= amount;
+        allowances[from_][msg.sender] -= amount_;
 
-        _transfer(from, to, amount);
+        _transfer(from_, to_, amount_);
     }
 
-    function _transfer(address from, address to, uint256 amount) internal {
-        if (balances[from] < amount) {
+    function _transfer(address from_, address to_, uint256 amount_) internal {
+        if (balances[from_] < amount_) {
             revert InsufficientFunds();
         }
-        balances[from] -= amount;
+        balances[from_] -= amount_;
 
-        (bool success,) = to.call{value: amount}("");
+        (bool success,) = to_.call{value: amount_}("");
         if (!success) {
             revert TransferFailed();
         }
-        emit Transfer(from, to, amount);
+        emit Transfer(from_, to_, amount_);
     }
 
     receive() external payable {

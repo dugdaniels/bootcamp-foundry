@@ -16,7 +16,7 @@ contract Multisig {
     address recipient;
     uint256 approvals;
     mapping(address => bool) public isSigner;
-    mapping(address => bool) hasApproved;
+    mapping(address => bool) public hasApproved;
 
     constructor(address[3] memory signers_, address recipient_) payable {
         if (msg.value != AMOUNT) revert FundsRequired();
@@ -42,12 +42,12 @@ contract Multisig {
         if (approvals == THRESHOLD) _send();
     }
 
-    function _addSigner(address addr) internal {
-        if (addr == address(0)) revert InvalidAddress();
-        if (isSigner[addr]) revert InvalidAddress();
+    function _addSigner(address addr_) internal {
+        if (addr_ == address(0)) revert InvalidAddress();
+        if (isSigner[addr_]) revert InvalidAddress();
 
-        isSigner[addr] = true;
-        emit SignerAdded(addr);
+        isSigner[addr_] = true;
+        emit SignerAdded(addr_);
     }
 
     function _send() internal {

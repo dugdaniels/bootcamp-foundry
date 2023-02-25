@@ -9,15 +9,15 @@ contract UserAccountMagicNumber {
 
     mapping(address => uint256) private magicNumber;
 
-    function setMagicNumber(uint256 _number) public {
-        if (_number == 0) revert InvalidMagicNumber(_number);
+    function setMagicNumber(uint256 number_) public {
+        if (number_ == 0) revert InvalidMagicNumber(number_);
         if (magicNumber[msg.sender] != 0) revert MagicNumberAlreadySet(magicNumber[msg.sender], msg.sender);
 
-        magicNumber[msg.sender] = _number;
-        emit MagicNumberSet(msg.sender, _number);
+        magicNumber[msg.sender] = number_;
+        emit MagicNumberSet(msg.sender, number_);
     }
 
-    function getMagicNumber(address _setter) external view returns (uint256) {
-        return magicNumber[_setter];
+    function getMagicNumber(address setter_) external view returns (uint256) {
+        return magicNumber[setter_];
     }
 }

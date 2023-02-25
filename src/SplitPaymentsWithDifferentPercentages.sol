@@ -13,11 +13,11 @@ contract SplitPaymentsWithDifferentPercentages {
     uint128 public secondSplit;
     mapping(address => uint256) public balances;
 
-    constructor(address _firstRecipient, address _secondRecipient, uint8 _firstSplit, uint8 _secondSplit) {
-        firstRecipient = payable(_firstRecipient);
-        secondRecipient = payable(_secondRecipient);
-        firstSplit = _firstSplit;
-        secondSplit = _secondSplit;
+    constructor(address firstRecipient_, address secondRecipient_, uint8 firstSplit_, uint8 secondSplit_) {
+        firstRecipient = payable(firstRecipient_);
+        secondRecipient = payable(secondRecipient_);
+        firstSplit = firstSplit_;
+        secondSplit = secondSplit_;
     }
 
     function withdraw() external {
@@ -36,10 +36,10 @@ contract SplitPaymentsWithDifferentPercentages {
         _split(dust);
     }
 
-    function _split(uint256 amount) internal {
+    function _split(uint256 amount_) internal {
         uint256 totalSplit = firstSplit + secondSplit;
-        balances[firstRecipient] += amount * firstSplit / totalSplit;
-        balances[secondRecipient] += amount * secondSplit / totalSplit;
+        balances[firstRecipient] += amount_ * firstSplit / totalSplit;
+        balances[secondRecipient] += amount_ * secondSplit / totalSplit;
     }
 
     receive() external payable {

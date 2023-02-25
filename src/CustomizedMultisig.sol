@@ -38,59 +38,59 @@ contract Multisig is Ownable {
         }
     }
 
-    function queueTransfer(address recipient, uint256 value, uint128 approvalsRequired)
+    function queueTransfer(address recipient_, uint256 value_, uint128 approvalsRequired_)
         public
         payable
         onlySigner
         returns (uint256 transferId)
     {
-        queuedBalance += value;
+        queuedBalance += value_;
         if (queuedBalance > address(this).balance) revert InsufficientFunds();
-        if (recipient == address(0)) revert InvalidAddress();
+        if (recipient_ == address(0)) revert InvalidAddress();
 
         // transferId is return value
         transferId = transferCount++;
 
         Transfer storage t = transfers[transferId];
-        t.recipient = recipient;
-        t.value = value;
-        t.approvalsRequired = approvalsRequired;
+        t.recipient = recipient_;
+        t.value = value_;
+        t.approvalsRequired = approvalsRequired_;
         t.approvalsReceived = 1;
         t.hasApproved[msg.sender] = true;
 
-        emit TransferQueued(transferId, recipient, value);
+        emit TransferQueued(transferId, recipient_, value_);
         emit ApprovalReceived(transferId, msg.sender);
     }
 
-    function approve(uint256 transferId) public onlySigner {
-        Transfer storage t = transfers[transferId];
+    function approve(uint256 transferId_) public onlySigner {
+        Transfer storage t = transfers[transferId_];
         if (t.executed) revert NotAuthorized();
         if (t.hasApproved[msg.sender]) revert NotAuthorized();
 
         uint128 approvals = ++t.approvalsReceived;
         t.hasApproved[msg.sender] = true;
-        emit ApprovalReceived(transferId, msg.sender);
+        emit ApprovalReceived(transferId_, msg.sender);
 
-        if (approvals == t.approvalsRequired) _execute(transferId);
+        if (approvals == t.approvalsRequired) _execute(transferId_);
     }
 
-    function addSigner(address addr) public onlyOwner {
-        if (addr == address(0)) revert InvalidAddress();
-        if (isSigner[addr]) revert InvalidAddress();
+    function addSigner(address addr_) public onlyOwner {
+        if (addr_ == address(0)) revert InvalidAddress();
+        if (isSigner[addr_]) revert InvalidAddress();
 
-        isSigner[addr] = true;
-        emit SignerAdded(addr);
+        isSigner[addr_] = true;
+        emit SignerAdded(addr_);
     }
 
-    function removeSigner(address addr) public onlyOwner {
-        if (!isSigner[addr]) revert InvalidAddress();
+    function removeSigner(address addr_) public onlyOwner {
+        if (!isSigner[addr_]) revert InvalidAddress();
 
-        isSigner[addr] = false;
-        emit SignerRemoved(addr);
+        isSigner[addr_] = false;
+        emit SignerRemoved(addr_);
     }
 
-    function _execute(uint256 transferId) internal {
-        Transfer storage t = transfers[transferId];
+    function _execute(uint256 transferId_) internal {
+        Transfer storage t = transfers[transferId_];
         address recipient = t.recipient;
 
         t.executed = true;

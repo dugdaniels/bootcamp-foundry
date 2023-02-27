@@ -31,11 +31,11 @@ contract NFTTest is Test {
         assertTrue(token.supportsInterface(0x80ac58cd)); // ERC721
     }
 
-    function testBalanceOf(address _address, uint256 balance) public {
-        bytes32 slot = keccak256(abi.encodePacked(abi.encode(_address), uint256(0)));
-        vm.store(address(token), slot, bytes32(balance));
+    function testBalanceOf(address address_, uint256 balance_) public {
+        bytes32 slot = keccak256(abi.encodePacked(abi.encode(address_), uint256(0)));
+        vm.store(address(token), slot, bytes32(balance_));
 
-        assertEq(token.balanceOf(_address), balance);
+        assertEq(token.balanceOf(address_), balance_);
     }
 
     function testOwnerOf(uint256 tokenId_, address owner_) public {
